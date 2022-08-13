@@ -1,8 +1,3 @@
-# from fastapi import FastAPI
-# from databases import Database
-# from api.core.config import DATABASE_URL
-# import logging
-
 from sqlalchemy import create_engine, exc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -12,6 +7,7 @@ from sqlalchemy import select
 from api.core.config import DATABASE_URL
 
 some_engine = create_engine(DATABASE_URL)
+
 
 @event.listens_for(some_engine, "engine_connect")
 def ping_connection(connection, branch):
@@ -48,9 +44,12 @@ def ping_connection(connection, branch):
         # restore "close with result"
         connection.should_close_with_result = save_should_close_with_result
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=some_engine)
+
+SessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=some_engine)
 
 Base = declarative_base()
+
 
 def get_db():
     db = SessionLocal()
@@ -58,29 +57,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
-# logger = logging.getLogger(__name__)
-
-
-# async def connect_to_db(app: FastAPI) -> None:
-#     database = Database(DATABASE_URL, min_size=2, max_size=10)  # these can be configured in config as well
-
-#     try:
-#         await database.connect()
-#         app.state._db = database
-        
-#     except Exception as e:
-#         logger.warn("--- DB CONNECTION ERROR ---")
-#         logger.warn(e)
-#         logger.warn("--- DB CONNECTION ERROR ---")
-
-
-# async def close_db_connection(app: FastAPI) -> None:
-#     try:
-#         await app.state._db.disconnect()
-#     except Exception as e:
-#         logger.warn("--- DB DISCONNECT ERROR ---")
-#         logger.warn(e)
-#         logger.warn("--- DB DISCONNECT ERROR ---")
-
